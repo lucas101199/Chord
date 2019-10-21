@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class main {
 
@@ -27,11 +29,25 @@ public class main {
         String content = "algorithm";
 
         Message message = new Message(id, sender, recipient, topic, timestamp, content);
+        DHT dht = new DHT(message);
+
+        dht.node.put(node1.getId()%16, node1);
+        dht.node.put(node2.getId()%16, node2);
+        dht.node.put(node3.getId()%16, node3);
+
         BigInteger rt = message.WhereToStoreMessage();
         System.out.println(rt);
+
+        dht.fillHashMap(message);
+
+        System.out.println(message);
 
         System.out.println(node1.getFingerTable());
         System.out.println(node2.getFingerTable());
         System.out.println(node3.getFingerTable());
+
+        System.out.println(node1.getMessage());
+        System.out.println(node2.getMessage());
+        System.out.println(node3.getMessage());
     }
 }

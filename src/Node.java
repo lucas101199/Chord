@@ -15,13 +15,17 @@ public class Node {
     Listener l;
 
     public Node(int id, InetSocketAddress address) throws IOException {
-        this.id = id;
+        this.id = id%16;
         this.address = address;
         l = new Listener(this);
         l.start();
 
         fingerTable = new HashMap<>();
         messageHashMap = new HashMap<>();
+    }
+
+    public void PutMessageInHashMap(Message message) {
+        this.messageHashMap.put(message.id, message);
     }
 
     public int getId() {
@@ -32,14 +36,13 @@ public class Node {
         return this.address;
     }
 
-    public InetSocketAddress find_successor(int id) throws IOException {
+    public InetSocketAddress find_successor(int id_node) throws IOException {
         InetSocketAddress succ = this.getSuccessor();
 
         for (int i = 1; i < 16; i++) {
-            int j = (id + i)%16;
+            int j = (id_node + i)%16;
             if (sendRequest(new InetSocketAddress("localhost", 9008+j))) {
-                return new InetSocketAddress("loc" +
-                        "alhost", 9008+j);
+                return new InetSocketAddress("localhost", 9008+j);
             }
         }
         return succ;
@@ -96,7 +99,6 @@ public class Node {
             System.out.println("Cannot get input stream from "+server.toString()+"\nRequest is: "+"\n");
         }
 
-
         // try to close socket
         try {
             talkSocket.close();
@@ -124,7 +126,7 @@ public class Node {
         return fingerTable;
     }
 
-    public void fillHashMapMessage(BigInteger key) throws IOException {
-        InetSocketAddress st = find_successor(key.intValue());
+    public HashMap<String, Message> getMessage() {
+        return messageHashMap;
     }
 }
